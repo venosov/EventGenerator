@@ -8,9 +8,13 @@ import akka.kafka.ProducerSettings
 import akka.kafka.scaladsl.Producer
 import akka.stream.scaladsl.Source
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.header.Header
+import org.apache.kafka.common.header.internals.RecordHeader
 import org.apache.kafka.common.serialization.StringSerializer
 
+import scala.collection.JavaConverters._
 import scala.util.Random
+
 
 case class ElectionEvent(name: String, surname: String, age: Int, party: String, date: String)
 
@@ -38,6 +42,21 @@ object Event extends App {
         Thread.sleep(500)
         new ProducerRecord[String, String]("clicks", value)
       })
+      .runWith(Producer.plainSink(producerSettings))
+  }
+
+  def eventWithHeaders() = {
+    val json = """{"name": "replaceName", "surname": "replaceSurname", "age": "replaceAge", "party": "replaceParty", "date": "replaceDate"}"""
+    println("Producing Election Data")
+    Source
+      .fromIterator[String](
+        () => Iterator.continually(
+          json.replaceName().replaceSurname().replaceAge().replaceParty().replaceDate()
+        ))
+      .map((value: String) => {
+        Thread.sleep(500)
+        new ProducerRecord[String, String](
+          "test", 0, "key", "value", Seq[Header](new RecordHeader("key", "localhost".getBytes())).asJava)      })
       .runWith(Producer.plainSink(producerSettings))
   }
 
