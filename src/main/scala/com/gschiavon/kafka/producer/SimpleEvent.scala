@@ -18,7 +18,7 @@ object SimpleEvent extends App with Init {
           json
         ))
       .map((value: String) => {
-        Thread.sleep(500)
+        Thread.sleep(1000)
         new ProducerRecord[String, String]("company", value)
       })
       .runWith(Producer.plainSink(producerSettings))

@@ -13,5 +13,5 @@ trait Init {
 
   val producerSettings =
     ProducerSettings(config, new StringSerializer, new StringSerializer)
-      .withBootstrapServers("localhost:9092")
+      .withBootstrapServers("localhost:29092")
 }
